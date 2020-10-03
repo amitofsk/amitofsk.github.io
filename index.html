@@ -1,8 +1,30 @@
 <html>
 	<body>
-		Hello...
+		Hello... Choose an option then press the button
+		<br>
+		
+
+                <input type="radio" name="choice1" id="A" value="A"> A
+		<input type="radio" name="choice1" id="B" value="B">B
+		<input type="radio" name="choice2" id="C" value="C">C
+		<input type="radio" name="choice2" id="D" value="D">D
+
+
+		<br>
+		<button onclick="myFunction()" id=button1">Check me</button>
 	<script>
 		document.write('Hello World');
+function myFunction() {
+	if(document.getElementById("A").checked==true)
+	{
+	   document.write("You clicked A");
+	}
+	else
+	{
+		document.write("You did not click A");
+	}
+
+}
 	</script>
 	</body>
 </html>
