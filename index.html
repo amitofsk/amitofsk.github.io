@@ -4,45 +4,53 @@
 		<br>
 		
 
-                <input type="radio" name="choice1" id="A" value="A"> A
-		<input type="radio" name="choice1" id="B" value="B">B
-		<input type="radio" name="choice2" id="C" value="C">C
-		<input type="radio" name="choice2" id="D" value="D">D
+                
                 <br>
 		<br>
 		<div class="btn-group">
-			<button onclick="setType()" id="A1" value="Empty">Empty</button>
-			<button  onclick="setType()" id="A2" value="Empty">Empty</button>
-			<button onclick="setType()" id="A3" value="Empty">Empty</button>
+			<button onclick="setType('A1')" id="A1" value="House">House</button>
+			<button  onclick="setType('A2')" id="A2" value="House">House</button>
+			<button onclick="setType('A3')" id="A3" value="House">House</button>
 		</div>
 
 		<div class="btn-group">
-			<button onclick="setType()"  id="B1"  value="Empty">Empty</button>
-			<button onclick="setType()" id="B2" value="Empty">Empty</button>
-			<button onclick="setType()"  id="B3" value="Empty">Empty</button>
+			<button onclick="setType('B1')"  id="B1"  value="House">House</button>
+			<button onclick="setType('B2')" id="B2" value="House">House</button>
+			<button onclick="setType('B3')"  id="B3" value="House">House</button>
 		</div>
 		<br>
-		<button onclick="myFunction()" id=button1">Check me</button>
+		<button onclick="myFunction()" id=button1">Find Score</button>
 	<script>
-		document.write('Hello World');
+		//document.write('Hello World');
+
 function myFunction() {
-	if(document.getElementById("A").checked==true)
-       
-	{
-	   document.write("You clicked A");
-	}
-  	else
-	{
-		document.write("You did not click A");
-                		
-	}
+	var score =0;
+        score=scoreMe('A1')+scoreMe('A2')+scoreMe('A3')+scoreMe('B1')+scoreMe('B2')+scoreMe('B3');
+	document.write("You get 1 point for a farm, 2 for a house, and 4 for a parking lot. Lower scores are better. Your score is "+score);
 
 }
 
-function setType() {
-      document.write("You clicked an empty button");	
-	
+function scoreMe(inLoc)
+{
+	if(document.getElementById(inLoc).value=="House")  {return 2;};
+	if(document.getElementById(inLoc).value=="Parking") {return 4;};
+	if (document.getElementById(inLoc).value=="Farm") {return 1;}
+}
 
+function setType(idval) {
+        if(document.getElementById(idval).value=="House")	
+	   {    document.getElementById(idval).value="Parking";
+	        document.getElementById(idval).innerHTML="Parking";}
+        else if(document.getElementById(idval).value=="Parking")
+	{
+                document.getElementById(idval).value="Farm";
+		document.getElementById(idval).innerHTML="Farm";
+	} 
+	else 
+	{
+		document.getElementById(idval).value="House";
+		document.getElementById(idval).innerHTML="House";
+	}
 }
 
 	</script>
