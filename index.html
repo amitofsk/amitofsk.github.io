@@ -8,23 +8,43 @@
 		<input type="radio" name="choice1" id="B" value="B">B
 		<input type="radio" name="choice2" id="C" value="C">C
 		<input type="radio" name="choice2" id="D" value="D">D
+                <br>
+		<br>
+		<div class="btn-group">
+			<button onclick="setType()" id="A1" value="Empty">Empty</button>
+			<button  onclick="setType()" id="A2" value="Empty">Empty</button>
+			<button onclick="setType()" id="A3" value="Empty">Empty</button>
+		</div>
 
-
+		<div class="btn-group">
+			<button onclick="setType()"  id="B1"  value="Empty">Empty</button>
+			<button onclick="setType()" id="B2" value="Empty">Empty</button>
+			<button onclick="setType()"  id="B3" value="Empty">Empty</button>
+		</div>
 		<br>
 		<button onclick="myFunction()" id=button1">Check me</button>
 	<script>
 		document.write('Hello World');
 function myFunction() {
 	if(document.getElementById("A").checked==true)
+       
 	{
 	   document.write("You clicked A");
 	}
-	else
+  	else
 	{
 		document.write("You did not click A");
+                		
 	}
 
 }
+
+function setType() {
+      document.write("You clicked an empty button");	
+	
+
+}
+
 	</script>
 	</body>
 </html>
