@@ -24,7 +24,11 @@
 
 
          <div id="mapid" style="width: 600px; height: 400px;"></div>
+         <p>Tree type: </p>
+	 <input type="radio" name ="treetype" value=false id="Spruce" checked=true> Spruce
+	 <input type="radio" name ="treetype" value=false id="Larch">Larch
 	 <p id="scoreText"></p>
+	 <button name="optimize" id="Optimize" onclick="optimizeMe()">Optimize Me</button>
 
 	 
 <script>
@@ -58,6 +62,19 @@
 
 
       var treeIcon = L.icon({
+          iconUrl: 'tree.png',
+          shadowUrl: 'tree.png',
+
+          iconSize:     [40,40], // size of the icon
+          shadowSize:   [40,40], // size of the shadow
+          iconAnchor:   [20, 20], // point of the icon which will correspond to marker's location
+          shadowAnchor: [30, 20],  // the same for the shadow
+          popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+      });
+
+
+
+    var tree2Icon = L.icon({
           iconUrl: 'tree2.png',
           shadowUrl: 'tree2.png',
 
@@ -67,6 +84,7 @@
           shadowAnchor: [30, 20],  // the same for the shadow
           popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
       });
+
  
       //display the score
       var myScore=0;
@@ -90,35 +108,103 @@
        }
 
        //Define objects of the class for polluters near Ft. Wayne
+       //Eventually this should be a vector or array ...
        servall=new Polluter("National Serv-all", 41.026142, -85.2267593, 282, 82470,1, factoryIcon);
        unitedrefuse=new Polluter("United Refuse", 41.043087, -85.211369, 18, 22645, 0, factoryIcon);
        gmassembly = new Polluter("GM Assembly Plant", 40.9625246, -85.3032187, 57479, 87, 173, factoryIcon);
        superiorAl= new Polluter("Superior Aluminum", 41.0740143, -84.9618769, 41630, 20, 23, factoryIcon);
-       
-
        //Put markers for each polluter
+
        L.marker([servall.latitude, servall.longitude], {icon: servall.icon}).addTo(mymap);
        L.marker([unitedrefuse.latitude, unitedrefuse.longitude], {icon: unitedrefuse.icon}).addTo(mymap);
        L.marker([gmassembly.latitude, gmassembly.longitude], {icon: gmassembly.icon}).addTo(mymap);
        L.marker([superiorAl.latitude, superiorAl.longitude], {icon: superiorAl.icon}).addTo(mymap);
 
 
+
+
+
+      //Define a class for trees
+      class treeSpecies {
+          constructor(myName, myCo2Multiplier, myMethaneMultiplier, myN2oMultiplier, myIcon)
+	      {
+                this.name=myName;
+		this.co2Multiplier=myCo2Multiplier;
+		this.methaneMultiplier=myMethaneMultiplier;
+		this.n20Multiplier=myN2oMultiplier;
+		this.icon=myIcon;
+	      }
+       }
+
+    //Create a few objects of class tree
+    spruceTree=new treeSpecies("Spruce Tree", 0.9, 0.9, 0.9, treeIcon);
+    larchTree=new treeSpecies("Larch Tree", 0.5, 0.5, 0.5, tree2Icon);
+
+
+
      //The onMapClick function says what happens when you click on the map
      //For now, it draws a marker. Eventually, it will also update the score. It will eventually use a function scoreMe
      function onMapClick(e){
 	//  alert("You clikced the map at "+e.latlng);
-	L.marker(e.latlng, {icon:treeIcon}).addTo(mymap);
-        myScore=10;
+	
+	//var treePic;
+       //handle the different trees separately
+       if(document.getElementById("Spruce").checked==true)
+	     {
+		   L.marker(e.latlng, {icon:spruceTree.icon}).addTo(mymap);
+	    }
+	else 
+	     {
+                   L.marker(e.latlng, {icon:larchTree.icon}).addTo(mymap);
+	     }
+	
+	//L.marker(e.latlng, {treePic}).addTo(mymap);
+        myScore=myScore+scoreMe();
 	scoreString="Score = "+myScore;
 	document.getElementById("scoreText").innerHTML=scoreString;
 
       }
-      
+     
+     //calculate the score
+     function scoreMe()
+     {       var tempscore=0;
+             //handle different trees separately ... they all have separate multipliers for each gas
+	     if(document.getElementById("Spruce").checked==true)
+	     {
+		     tempscore=20;
+	     }
+	     else
+	     {
+		     tempscore=30;
+	     }
+	     
+	     return tempscore;
+     }
 
-
+     //Map click event listener
      mymap.on('click', onMapClick);
 
 
+     //Eventually the optimization function will be here
+     function optimizeMe() {
+       document.getElementById("scoreText").innerHTML="Coming Soon";
+
+	     //Guess a latitude and longitude
+	     //Calculate the score
+	     //Repeat 10 times and remember the best
+
+	     //Guess latitutdes and longitudes closer to it (decrease simulated annealing temp)
+	     //Claculate the score
+	     //Repeat 10 times and remember the best
+
+	     //Guess latitudes and longitudes closer to it
+	     //Calculate the score
+	     //Repeat 10 times and remember the best
+
+	     //Put a tree icon there
+	     //Report the result
+     };
+     
 
 </script>
 
