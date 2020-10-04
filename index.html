@@ -1,70 +1,82 @@
+
+<!DOCTYPE html>
 <html>
+<head>
 	
-	<body>
-	Hello World
-I'm following the example https://stackoverflow.com/questions/39253980/how-to-draw-a-point-on-image-based-on-coordinate-value-of-various-points-on-imag
-      <br>	
-      <canvas id="Canvas" width="700" height="700"></canvas>
-		
-		
-	<script>
-	var canvas = document.getElementById('Canvas');
-        var context = canvas.getContext("2d");
+	<title>Next Door Neighbors</title>
 
-        var treeSprite = new Image();
-        treeSprite.src = "tree.png";
-
-        var factorySprite = new Image();
-        factorySprite.src = "factory.png";
-
-         var mx=50;
-         var my=50;
-         var myText="Score=";
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	
+	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+
+
 	
-            
-       var mouseClicked = function(mouse) {
-	      // var rect=canvas.getBoundingClientRect();
-	      // var mouseXPos = (mouse.x-rect.left);
-	      // var mouseYPos = (mouse.y - rect.top);
-	       
-	      // mx=mouseXpos-(marker.Width/2);
-	      // my= mouseYPos - marker.Height;
-               mx=mouse.x;
-	       my=mouse.y;
-	       //context.fillStyle="#222";
-	       //context.fillRect(0,0, 300,300);
-	       draw(mx, my);
-       }
-
-        //Add mouse click event listener
-	canvas.addEventListener("mousedown", mouseClicked, false);
+</head>
+<body>
 
 
+
+<div id="mapid" style="width: 600px; height: 400px;"></div>
+<script>
+
+	var mymap = L.map('mapid').setView([41.03, -85.13], 10);
+
+	L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+		maxZoom: 18,
+		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+			'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+			'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+		id: 'mapbox/streets-v11',
+		tileSize: 512,
+		zoomOffset: -1
+	}).addTo(mymap);
+/*
+   var factoryIcon=L.icon({
+	   iconUrl: 'factory.png',
+	   shadowUrl: 'tree.png',
+
+	   iconSize: [38,95],
+	   shadowSize [50,64],
+	   iconAnchor: [22,94],
+           shadowAnchor: [4, 62],
+	   popupAnchor: [-3, -76]
+   });
+*/
+//I'm adding the four pollution sources as markers now... Next I'll add as pics
+       //Serv All landfill
+//L.marker([41.026142, -85.2267593], {icon: factoryIcon}).addTo(mymap);
+       L.marker([41.026142, -85.2267593]).addTo(mymap);
+   //United Refuse Landfill
+       //GM assembly plant
+       //Superior Aluminum factory
        
-	
-       var main = function () {
-	       draw(mx,my);
-       }
 
-       var draw = function (ma,mb){
-          context.fillStyle= "#555";
-	  context.fillRect(0,0, canvas.width, canvas.height);
-	  context.drawImage(factorySprite, 100,100,40,40);
-          context.drawImage(treeSprite, ma,mb,40,40);
-          myText="Score="+(ma+mb);
-	  context.font="15px Georgia";
-	  context.textAlign="center";
-          context.fillStyle="#000";
-	  context.fillText(myText, 300, 300);
 
-       }
+/*
+	L.marker([51.5, -0.09]).addTo(mymap);
 
-      setInterval(main, (1000/100));
+	L.circle([51.508, -0.11], {
+		color: 'red',
+		fillColor: '#f03',
+		fillOpacity: 0.5,
+		radius: 500
+	}).addTo(mymap);
 
-	</script>
-	
-	
-	</body>
+	L.polygon([
+		[51.509, -0.08],
+		[51.503, -0.06],
+		[51.51, -0.047]
+	]).addTo(mymap);
+*/
+
+</script>
+
+
+
+</body>
 </html>
 

@@ -1,0 +1,70 @@
+<html>
+	
+	<body>
+	Hello World
+I'm following the example https://stackoverflow.com/questions/39253980/how-to-draw-a-point-on-image-based-on-coordinate-value-of-various-points-on-imag
+      <br>	
+      <canvas id="Canvas" width="700" height="700"></canvas>
+		
+		
+	<script>
+	var canvas = document.getElementById('Canvas');
+        var context = canvas.getContext("2d");
+
+        var treeSprite = new Image();
+        treeSprite.src = "tree.png";
+
+        var factorySprite = new Image();
+        factorySprite.src = "factory.png";
+
+         var mx=50;
+         var my=50;
+         var myText="Score=";
+	
+	
+            
+       var mouseClicked = function(mouse) {
+	      // var rect=canvas.getBoundingClientRect();
+	      // var mouseXPos = (mouse.x-rect.left);
+	      // var mouseYPos = (mouse.y - rect.top);
+	       
+	      // mx=mouseXpos-(marker.Width/2);
+	      // my= mouseYPos - marker.Height;
+               mx=mouse.x;
+	       my=mouse.y;
+	       //context.fillStyle="#222";
+	       //context.fillRect(0,0, 300,300);
+	       draw(mx, my);
+       }
+
+        //Add mouse click event listener
+	canvas.addEventListener("mousedown", mouseClicked, false);
+
+
+       
+	
+       var main = function () {
+	       draw(mx,my);
+       }
+
+       var draw = function (ma,mb){
+          context.fillStyle= "#555";
+	  context.fillRect(0,0, canvas.width, canvas.height);
+	  context.drawImage(factorySprite, 100,100,40,40);
+          context.drawImage(treeSprite, ma,mb,40,40);
+          myText="Score="+(ma+mb);
+	  context.font="15px Georgia";
+	  context.textAlign="center";
+          context.fillStyle="#000";
+	  context.fillText(myText, 300, 300);
+
+       }
+
+      setInterval(main, (1000/100));
+
+	</script>
+	
+	
+	</body>
+</html>
+
