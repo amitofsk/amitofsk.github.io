@@ -4,27 +4,34 @@
 <head>
 	
 	<title>Next Door Neighbors</title>
-
+  
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	
 	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
-
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+  
+	
+	
 
 	
 </head>
 <body>
+        <h2>Next Door Neighbors</h2>
+	<h3>Where should I plant a tree?</h3>
 
 
+         <div id="mapid" style="width: 600px; height: 400px;"></div>
+	 <p id="scoreText"></p>
 
-<div id="mapid" style="width: 600px; height: 400px;"></div>
+	 
 <script>
+	//I'm closely following the example at: https://leafletjs.com/examples/quick-start/
+        //Define a map centered in Fort Wayne Indiana
 
 	var mymap = L.map('mapid').setView([41.03, -85.13], 10);
-
 	L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
 		maxZoom: 18,
 		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
@@ -34,44 +41,84 @@
 		tileSize: 512,
 		zoomOffset: -1
 	}).addTo(mymap);
-/*
-   var factoryIcon=L.icon({
-	   iconUrl: 'factory.png',
-	   shadowUrl: 'tree.png',
 
-	   iconSize: [38,95],
-	   shadowSize [50,64],
-	   iconAnchor: [22,94],
-           shadowAnchor: [4, 62],
-	   popupAnchor: [-3, -76]
-   });
-*/
-//I'm adding the four pollution sources as markers now... Next I'll add as pics
-       //Serv All landfill
-//L.marker([41.026142, -85.2267593], {icon: factoryIcon}).addTo(mymap);
-       L.marker([41.026142, -85.2267593]).addTo(mymap);
-   //United Refuse Landfill
-       //GM assembly plant
-       //Superior Aluminum factory
+
+       //Define the icons for the markers
+       
+       var factoryIcon = L.icon({
+           iconUrl: 'simple1.png',
+           shadowUrl: 'simple1.png',
+
+           iconSize:     [40,40], // size of the icon
+           shadowSize:   [40,40], // size of the shadow
+           iconAnchor:   [20, 20], // point of the icon which will correspond to marker's location
+           shadowAnchor: [30, 20],  // the same for the shadow
+           popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+       }); 
+
+
+      var treeIcon = L.icon({
+          iconUrl: 'tree2.png',
+          shadowUrl: 'tree2.png',
+
+          iconSize:     [40,40], // size of the icon
+          shadowSize:   [40,40], // size of the shadow
+          iconAnchor:   [20, 20], // point of the icon which will correspond to marker's location
+          shadowAnchor: [30, 20],  // the same for the shadow
+          popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+      });
+ 
+      //display the score
+      var myScore=0;
+      var scoreString="Score ="+myScore;
+      document.getElementById("scoreText").innerHTML=scoreString;
+
+
+       //I'm going to hardcode the info about Pollution sources in fort wayne for now... Later I want this input from an external file...
+       //Make a class for the polluters
+        class Polluter{
+	       constructor(myName, myLatitude, myLongitude, myCo2, myMethane, myN20, myIcon)
+	          {
+			  this.name=myName;
+			  this.latitude=myLatitude;
+			  this.longitude=myLongitude;
+			  this.co2=myCo2;
+			  this.methane=myMethane;
+			  this.n20=myN20;
+			  this.icon=myIcon;
+		  }
+       }
+
+       //Define objects of the class for polluters near Ft. Wayne
+       servall=new Polluter("National Serv-all", 41.026142, -85.2267593, 282, 82470,1, factoryIcon);
+       unitedrefuse=new Polluter("United Refuse", 41.043087, -85.211369, 18, 22645, 0, factoryIcon);
+       gmassembly = new Polluter("GM Assembly Plant", 40.9625246, -85.3032187, 57479, 87, 173, factoryIcon);
+       superiorAl= new Polluter("Superior Aluminum", 41.0740143, -84.9618769, 41630, 20, 23, factoryIcon);
        
 
+       //Put markers for each polluter
+       L.marker([servall.latitude, servall.longitude], {icon: servall.icon}).addTo(mymap);
+       L.marker([unitedrefuse.latitude, unitedrefuse.longitude], {icon: unitedrefuse.icon}).addTo(mymap);
+       L.marker([gmassembly.latitude, gmassembly.longitude], {icon: gmassembly.icon}).addTo(mymap);
+       L.marker([superiorAl.latitude, superiorAl.longitude], {icon: superiorAl.icon}).addTo(mymap);
 
-/*
-	L.marker([51.5, -0.09]).addTo(mymap);
 
-	L.circle([51.508, -0.11], {
-		color: 'red',
-		fillColor: '#f03',
-		fillOpacity: 0.5,
-		radius: 500
-	}).addTo(mymap);
+     //The onMapClick function says what happens when you click on the map
+     //For now, it draws a marker. Eventually, it will also update the score. It will eventually use a function scoreMe
+     function onMapClick(e){
+	//  alert("You clikced the map at "+e.latlng);
+	L.marker(e.latlng, {icon:treeIcon}).addTo(mymap);
+        myScore=10;
+	scoreString="Score = "+myScore;
+	document.getElementById("scoreText").innerHTML=scoreString;
 
-	L.polygon([
-		[51.509, -0.08],
-		[51.503, -0.06],
-		[51.51, -0.047]
-	]).addTo(mymap);
-*/
+      }
+      
+
+
+     mymap.on('click', onMapClick);
+
+
 
 </script>
 
