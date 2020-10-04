@@ -18,6 +18,13 @@
 
 	
 </head>
+
+<style> 
+body {
+	background-color: #536c75;
+}
+
+</style>
 <body>
         <h2>Next Door Neighbors</h2>
 	<h3>Where should I plant a tree?</h3>
@@ -25,10 +32,13 @@
 
          <div id="mapid" style="width: 600px; height: 400px;"></div>
          <p>Tree type: </p>
-	 <input type="radio" name ="treetype" value=false id="Spruce" checked=true> Spruce
-	 <input type="radio" name ="treetype" value=false id="Larch">Larch
+	 <input type="radio" name ="treetype" value=false id="Beech" checked=true> Beech
+	 <input type="radio" name ="treetype" value=false id="Birch">Birch
+	 <input type="radio" name ="treetype" value=false id="Cottonwood">Cottonwood
+	 <input type="radio" name ="treetype" value=false id="Hemlock">Hemlock
+	 <input type="radio" name ="treetype" value=false id="Pine">Pine
 	 <p id="scoreText"></p>
-	 <button name="optimize" id="Optimize" onclick="optimizeMe()">Optimize Me</button>
+	 <button name="optimize" id="Optimize" onclick="optimizeMe()">Best Location</button>
 
 	 
 <script>
@@ -93,7 +103,7 @@
 
 
        //I'm going to hardcode the info about Pollution sources in fort wayne for now... Later I want this input from an external file...
-       //Make a class for the polluters
+       //Make a class descibing the polluters
         class Polluter{
 	       constructor(myName, myLatitude, myLongitude, myCo2, myMethane, myN20, myIcon)
 	          {
@@ -107,13 +117,13 @@
 		  }
        }
 
-       //Define objects of the class for polluters near Ft. Wayne
+       //Define objects of the class from polluters near Ft. Wayne
        //Eventually this should be a vector or array ...
        servall=new Polluter("National Serv-all", 41.026142, -85.2267593, 282, 82470,1, factoryIcon);
        unitedrefuse=new Polluter("United Refuse", 41.043087, -85.211369, 18, 22645, 0, factoryIcon);
        gmassembly = new Polluter("GM Assembly Plant", 40.9625246, -85.3032187, 57479, 87, 173, factoryIcon);
        superiorAl= new Polluter("Superior Aluminum", 41.0740143, -84.9618769, 41630, 20, 23, factoryIcon);
-       //Put markers for each polluter
+       //Put markers on polluter
 
        L.marker([servall.latitude, servall.longitude], {icon: servall.icon}).addTo(mymap);
        L.marker([unitedrefuse.latitude, unitedrefuse.longitude], {icon: unitedrefuse.icon}).addTo(mymap);
@@ -124,7 +134,7 @@
 
 
 
-      //Define a class for trees
+      //Define a cclass for trees
       class treeSpecies {
           constructor(myName, myCo2Multiplier, myMethaneMultiplier, myN2oMultiplier, myIcon)
 	      {
@@ -137,47 +147,97 @@
        }
 
     //Create a few objects of class tree
-    spruceTree=new treeSpecies("Spruce Tree", 0.9, 0.9, 0.9, treeIcon);
-    larchTree=new treeSpecies("Larch Tree", 0.5, 0.5, 0.5, tree2Icon);
-
-
-
+    beechTree=new treeSpecies("Beech Tree", 0.9, 0.9, 0.9, treeIcon);
+    birchTree=new treeSpecies("Birch Tree", 0.5, 0.5, 0.5, tree2Icon);
+    cottonwoodTree=new treeSpecies("CottonWood Tree", 0.1, 0.1, 0.1, treeIcon);
+    hemlockTree= new treeSpecies("Hemlock Tree", 0.2, 0.2, 0.2, treeIcon);
+    pineTree= new treeSpecies("Pine", 0.3,0.3,0.3, treeIcon);
+     
+    
      //The onMapClick function says what happens when you click on the map
      //For now, it draws a marker. Eventually, it will also update the score. It will eventually use a function scoreMe
      function onMapClick(e){
 	//  alert("You clikced the map at "+e.latlng);
 	
-	//var treePic;
-       //handle the different trees separately
-       if(document.getElementById("Spruce").checked==true)
-	     {
-		   L.marker(e.latlng, {icon:spruceTree.icon}).addTo(mymap);
-	    }
-	else 
-	     {
-                   L.marker(e.latlng, {icon:larchTree.icon}).addTo(mymap);
-	     }
 	
-	//L.marker(e.latlng, {treePic}).addTo(mymap);
-        myScore=myScore+scoreMe();
+       //deal with the different trees separately
+   
+       var myT="Beech";
+       if(document.getElementById("Beech").checked == true)
+	      { 
+		      myT="Beech";
+	      }
+       if(document.getElementById("Birch").checked == true) 
+	     {
+		     myT="Birch";
+	     }
+       if(document.getElementById("Cottonwood").checked == true)
+		{
+			myT="Cottonwood";
+		}
+	if(document.getElementById("Hemlock").checked == true)
+	     {
+		     myT="Hemlock";
+	     }
+	if(document.getElementById("Pine").checked ==true)
+	     {
+		     myT="Pine";
+	     }
+	     
+       switch(myT) {
+
+	     case "Beech":
+		     L.marker(e.latlng, {icon:beechTree.icon}).addTo(mymap);
+		     break;
+	    case "Birch":
+		     L.marker(e.latlng, {icon:birchTree.icon}).addTo(mymap);
+		     break;
+            case "Cottonwood":
+		       L.marker(e.latlng, {icon:cottonwoodTree.icon}).addTo(mymap);
+		       break;
+            case "Hemlock":
+		       L.marker(e.latlng, {icon:hemlockTree.icon}).addTo(mymap);
+		       break;
+            case "Pine":
+		       L.marker(e.latlng, {icon:pineTree.icon}).addTo(mymap);
+
+
+     }
+
+        myScore=myScore+scoreMe(myT);
 	scoreString="Score = "+myScore;
 	document.getElementById("scoreText").innerHTML=scoreString;
 
       }
      
      //calculate the score
-     function scoreMe()
+     function scoreMe(mySpecies)
      {       var tempscore=0;
-             //handle different trees separately ... they all have separate multipliers for each gas
-	     if(document.getElementById("Spruce").checked==true)
-	     {
-		     tempscore=20;
-	     }
-	     else
-	     {
-		     tempscore=30;
-	     }
+	     //handle different trees separately ... they all have separate multipliers from gas
+
+             switch (mySpecies) {
+               case "Beech":
+			     tempscore=10;
+			     break;
+	       case "Birch":
+			     tempscore=20;
+			     break;
+	       case "Cottonwood":
+			     tempscore=30;
+			     break;
+	       case "Hemlock":
+			     tempscore=40;
+			     break;
+	       case "Pine":
+			     tempscore=50;
+
+
+
+              }
+             tempscore=10*Math.random();             
+			     
 	     
+ 
 	     return tempscore;
      }
 
@@ -187,22 +247,91 @@
 
      //Eventually the optimization function will be here
      function optimizeMe() {
-       document.getElementById("scoreText").innerHTML="Coming Soon";
-
-	     //Guess a latitude and longitude
-	     //Calculate the score
+             
+             var bestLat=41.05;
+	     var bestLong=-85.13;
+	     var tempLong=41.1;
+	     var tempLat=-85.1;
+	     var centerLat=41.05;
+	     var centerLong=-85.13;
+             var outString=" ";
+	     var bestScoreMe=1;
+	     var tempScoreMe=0; //Assume high score is good fornow....  
+	     //This assumes the Fort Wayne Area... eventually generalize this...
+             //Corners of the Ft Wayne map are 40.9, -84.8 and 41.2, -85.5
+	     //Latitude range is 0.3 and longitude range is 0.7
+	     //This uses random scores so far...
+             //Also this assumes a beech tree
+	     
+	     //Guess a latitude within 0.15 and longitude within 0.35 of the center values
+	     //This uses a latitude range of 0.15 and longitude range 0.35
+	     //Calculate the score, random fornow
 	     //Repeat 10 times and remember the best
 
-	     //Guess latitutdes and longitudes closer to it (decrease simulated annealing temp)
-	     //Claculate the score
-	     //Repeat 10 times and remember the best
 
-	     //Guess latitudes and longitudes closer to it
-	     //Calculate the score
-	     //Repeat 10 times and remember the best
+             //Guess latitutdes within 0.05 and  longitude within 0.05 of the best values (decrease "temperature")
+             //This uses a latitude range of 0.05 and longitude range 0.05
+	     //Claculate the score, random fornow
+             //Repeat 10 times and remember the best
+
+
+
+             //Guess latitudes within 0.01 and  longitude within 0.01 of the best values
+	     //This uses latitude range 0.01 and longitude range 0.01
+             //Calculate the score, random fornow
+             //Repeat 10 times and remember the best
+             var latRange=0.1;
+	     var longRange=0.1;
+
+	     for (temperature=0;temperature<3; temperature++)
+	     {
+               if(temperature==0)
+		 {
+                      latRange=0.15;
+		      longRange=0.35;
+		 }
+		 if(temperature ==1)
+		 { 
+		      latRange=0.05;
+		      longRange=0.05;
+		 }
+		 if(temperature ==2)
+		 {
+                      latRange=0.01;
+		      longRange=0.01;
+
+		 }
+		     
+	       for(ii=0;ii<10;ii++)
+	          {
+                   tempLat=centerLat-latRange+(2*latRange*Math.random());
+	           tempLong=centerLong-longRange+(2*longRange*Math.random());
+	           tempScoreMe=scoreMe("Beech");
+	           if(tempScoreMe>bestScoreMe)
+		       {
+                          bestLat=tempLat;
+		          bestLong=tempLong;
+			  bestScoreMe=tempScoreMe;
+		     }
+             
+	        } 
+            }
+
+	     
 
 	     //Put a tree icon there
 	     //Report the result
+
+             outString="The best Latitude = ";
+             outString=outString+bestLat;
+             outString=outString+" and longitude =";
+             outString=outString+bestLong;
+           
+	     //This only puts beechTrees... fixme
+	     L.marker([bestLat,bestLong], {icon:beechTree.icon}).addTo(mymap);
+             document.getElementById("scoreText").innerHTML=outString;
+           
+
      };
      
 
