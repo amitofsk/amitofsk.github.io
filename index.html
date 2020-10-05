@@ -42,8 +42,25 @@ body {
 
 	 
 <script>
-	//I'm closely following the example at: https://leafletjs.com/examples/quick-start/
-        //Define a map centered in Fort Wayne Indiana
+
+	/*
+          This program is by Andy Mitofsky and Veronica Pablo Osoria. 
+	  It is our entry in the Space Apps 2020 challenge in the Carbon Footprint category.
+
+	  We use the Leaflet mapping API. The tutorial for this API is available at:
+	  https://leafletjs.com/examples/quick-start/
+	  We used this tutorial closely.
+
+	  We center the map on Fort Wayne Indiana, and polluters used are specific to that area.
+	  For more info, see our Space Apps project page: 
+	  https://2020.spaceappschallenge.org/challenges/inform/carbon-footprint/teams/next-door-neighbors/project
+
+	*/
+	
+	
+	
+	
+	
 
 	var mymap = L.map('mapid').setView([41.03, -85.13], 10);
 	L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
@@ -85,7 +102,7 @@ body {
 
 
     var tree1Icon = L.icon({
-          iconUrl: 'tree3.png',
+          iconUrl: 'tree7.png',
           shadowUrl: 'shadow1.png',
 
           iconSize:     [40,40], // size of the icon
@@ -120,7 +137,7 @@ body {
 
 
     var tree4Icon = L.icon({
-          iconUrl: 'tree6.png',
+          iconUrl: 'tree3.png',
           shadowUrl: 'shadow1.png',
 
           iconSize:     [40,40], // size of the icon
@@ -133,7 +150,7 @@ body {
 
 
    var tree5Icon = L.icon({
-          iconUrl: 'tree7.png',
+          iconUrl: 'tree6.png',
           shadowUrl: 'shadow1.png',
 
           iconSize:     [40,40], // size of the icon
@@ -182,24 +199,24 @@ body {
 
 
 
-      //Define a cclass for trees
+      //Define a class for trees
       class treeSpecies {
-          constructor(myName, myCo2Multiplier, myMethaneMultiplier, myN2oMultiplier, myIcon)
+          constructor(myName, myCo2Abs, myMethaneAbs, myN2oAbs, myIcon)
 	      {
                 this.name=myName;
-		this.co2Multiplier=myCo2Multiplier;
-		this.methaneMultiplier=myMethaneMultiplier;
-		this.n20Multiplier=myN2oMultiplier;
+		this.co2Abs=myCo2Abs;  //Average yearly CO2 Absorption in kg
+		this.methaneAbs=myMethaneAbs; //Average yearly methane absorption (not used yet)
+		this.n20Abs=myN2oAbs;  //Average yearly N2O absorption (not used yet)
 		this.icon=myIcon;
 	      }
        }
 
     //Create a few objects of class tree
-    beechTree=new treeSpecies("Beech Tree", 0.9, 0.9, 0.9, tree1Icon);
-    birchTree=new treeSpecies("Birch Tree", 0.5, 0.5, 0.5, tree2Icon);
-    cottonwoodTree=new treeSpecies("CottonWood Tree", 0.1, 0.1, 0.1, tree3Icon);
-    hemlockTree= new treeSpecies("Hemlock Tree", 0.2, 0.2, 0.2, tree4Icon);
-    pineTree= new treeSpecies("Pine", 0.3,0.3,0.3, tree5Icon);
+    beechTree=new treeSpecies("Beech Tree", 8.55, 0.9, 0.9, tree1Icon);
+    birchTree=new treeSpecies("Birch Tree", 358.09, 0.5, 0.5, tree2Icon);
+    cottonwoodTree=new treeSpecies("CottonWood Tree", 84.87, 0.1, 0.1, tree3Icon);
+    hemlockTree= new treeSpecies("Hemlock Tree", 39.85, 0.2, 0.2, tree4Icon);
+    pineTree= new treeSpecies("Pine", 0.40,0.3,0.3, tree5Icon);
      
     
      //The onMapClick function says what happens when you click on the map
@@ -231,62 +248,112 @@ body {
 	     {
 		     myT="Pine";
 	     }
-	     
+       var XCO2;     
        switch(myT) {
 
 	     case "Beech":
 		     L.marker(e.latlng, {icon:beechTree.icon}).addTo(mymap);
-		     break;
+		     XCO2=beechTree.co2Abs;
+		       break;
 	    case "Birch":
 		     L.marker(e.latlng, {icon:birchTree.icon}).addTo(mymap);
-		     break;
+		     XCO2=birchTree.co2Abs;
+		       break;
             case "Cottonwood":
 		       L.marker(e.latlng, {icon:cottonwoodTree.icon}).addTo(mymap);
+		       XCO2=cottonwoodTree.co2Abs;
 		       break;
             case "Hemlock":
+
 		       L.marker(e.latlng, {icon:hemlockTree.icon}).addTo(mymap);
+		       XCO2=hemlockTree.co2Abs;
 		       break;
             case "Pine":
 		       L.marker(e.latlng, {icon:pineTree.icon}).addTo(mymap);
+		       XCO2=pineTree.co2Abs;
 
 
      }
-
-        myScore=myScore+scoreMe(myT);
+       // myScore=myScore+scoreMe(XCO2, 41, 85);
+       //note this is for one tree only, not cummulative
+       myScore=scoreMe(XCO2, e.latlng.lat, e.latlng.lng);
+       
+           
 	scoreString="Score = "+myScore;
 	document.getElementById("scoreText").innerHTML=scoreString;
 
       }
      
      //calculate the score
-     function scoreMe(mySpecies)
-     {       var tempscore=0;
+function scoreMe(YCO2, Ylat, Ylong) {
+
+	     /*
+		Higher scores are better. For the tree just placed and each of the four polluters, 
+		calculate the distance between them. For each polluter, calculate the 
+	        yearly CO2 emission by the polluter times the CO2 absorbed by that particular tree 
+	        divided by the distance polluter to tree squared. The score is the sum of values 
+	        for all four polluters. Score is based on distance^-2 because we can approximate pollution 
+	        as being distributed, per unit time, over the surface of a sphere centered on the polluter.
+                For now, this is specific for the four Ft. Wayne polluters.
+	     */
+
+	
+	     var tempscore=0;
+	     var tempscoreA=0;
+	     var tempscoreB=0;
+	     var tempscoreC=0;
+	     var tempscoreD=0;
+	     var distA=0;
+	     var distB=0;
+	     var distC=0;
+	     var distD=0;
 	     //handle different trees separately ... they all have separate multipliers from gas
 
-             switch (mySpecies) {
-               case "Beech":
-			     tempscore=10;
-			     break;
-	       case "Birch":
-			     tempscore=20;
-			     break;
-	       case "Cottonwood":
-			     tempscore=30;
-			     break;
-	       case "Hemlock":
-			     tempscore=40;
-			     break;
-	       case "Pine":
-			     tempscore=50;
+                         
 
-
-
-              }
-             tempscore=10*Math.random();             
-			     
+	     //For first polluter, use servall's values
+	     var servallCO2=282;
+	     var servallLat=41.026142;
+	     var servallLong=-85.2267593
+             var servallLatLong=L.latLng(servallLat, servallLong);
+	     var Zlatlng=L.latLng(Ylat,Ylong); //Latitude and long of the tree just placed
+            
+             distA=Zlatlng.distanceTo(servallLatLong); 
+	     tempscoreA=YCO2*servallCO2/(distA*distA);
+             
+	     //For the second polluter, use unitedrefuse values
+	     var urCO2=18;
+	     var urLat=41.043087;
+	     var urLong=-85.211369;
+	     var urLatLong=L.latLng(urLat, urLong);
 	     
- 
-	     return tempscore;
+             distB=Zlatlng.distanceTo(urLatLong);
+	     tempscoreB=YCO2*urCO2/(distB*distB);
+
+	     //For the third polluter use gmassembly values
+             var gmCO2=57479;
+	     var gmLat=40.9625246;
+	     var gmLong=-85.3032187;
+	     var gmLatLong=L.latLng(gmLat, gmLong);
+
+	     distC=Zlatlng.distanceTo(gmLatLong);
+	     tempscoreC=YCO2*gmCO2/(distC*distC);
+
+	     //For the fourth polluter use superiorAl values
+             var saCO2=41630;
+	     var saLat=40.0740143;
+	     var saLong=-84.9618769;
+	     var saLatLong=L.latLng(saLat, saLong);
+	     distD=Zlatlng.distanceTo(saLatLong);
+	     tempscoreD=YCO2*saCO2/(distD*distD);
+             
+    
+	     tempscore=tempscoreA+tempscoreB+tempscoreC+tempscoreD;
+	     
+   
+ 	     return tempscore;
+	
+		
      }
 
      //Map click event listener
@@ -303,9 +370,11 @@ body {
 	     var centerLat=41.05;
 	     var centerLong=-85.13;
              var outString=" ";
-	     var bestScoreMe=1;
-	     var tempScoreMe=0; //Assume high score is good fornow....  
-	     //This assumes the Fort Wayne Area... eventually generalize this...
+	     var bestScoreMe=-5;
+	     var tempScoreMe=0; //High scores are better
+	     
+
+             //This assumes the Fort Wayne Area... eventually generalize this...
              //Corners of the Ft Wayne map are 40.9, -84.8 and 41.2, -85.5
 	     //Latitude range is 0.3 and longitude range is 0.7
 	     //This uses random scores so far...
@@ -319,7 +388,7 @@ body {
 
              //Guess latitutdes within 0.05 and  longitude within 0.05 of the best values (decrease "temperature")
              //This uses a latitude range of 0.05 and longitude range 0.05
-	     //Claculate the score, random fornow
+	     //Calculate the score, random for now
              //Repeat 10 times and remember the best
 
 
@@ -330,6 +399,8 @@ body {
              //Repeat 10 times and remember the best
              var latRange=0.1;
 	     var longRange=0.1;
+	     var mylatlng;
+	     var beechCO2=8.55; //For now assume beech tree absorption of CO2 in kg/year
 
 	     for (temperature=0;temperature<3; temperature++)
 	     {
@@ -354,7 +425,8 @@ body {
 	          {
                    tempLat=centerLat-latRange+(2*latRange*Math.random());
 	           tempLong=centerLong-longRange+(2*longRange*Math.random());
-	           tempScoreMe=scoreMe("Beech");
+	           mylatlng=L.latLng(tempLat, tempLong);
+	           tempScoreMe=scoreMe(beechCO2, tempLat, tempLong);   //USES SCOREME FUNCTION
 	           if(tempScoreMe>bestScoreMe)
 		       {
                           bestLat=tempLat;
